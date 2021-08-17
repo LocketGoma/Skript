@@ -55,7 +55,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A block that gets all data from a BlockState, and either reflects changes on the BlockState or delays them to the real block by 1 tick depending on which constructor is used.
  * 
- * @author Peter Güttinger
+ * @author Peter Gttinger
  */
 @SuppressWarnings("deprecation")
 public class BlockStateBlock implements Block {
@@ -465,6 +465,11 @@ public class BlockStateBlock implements Block {
 	
 	@Override
 	public String getTranslationKey() {
+		return state.getBlock().getTranslationKey();
+	}
+	
+	@Override
+	public String translationKey() {
 		return state.getBlock().getTranslationKey();
 	}
 	
