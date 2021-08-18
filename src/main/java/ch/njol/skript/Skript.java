@@ -59,11 +59,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -71,6 +73,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -1453,7 +1456,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			if (sender instanceof Player) {
 				final PlayerCommandPreprocessEvent e = new PlayerCommandPreprocessEvent((Player) sender, "/" + command);
 				Bukkit.getPluginManager().callEvent(e);
-				if (e.isCancelled() || (!e.getMessage().startsWith("/")&&(!e.getMessage().startsWith("!"))))		//!Add
+				if (e.isCancelled() || (!e.getMessage().startsWith("/")))		//!Add
 					return false;
 				return Bukkit.dispatchCommand(e.getPlayer(), e.getMessage().substring(1));
 			} else {
@@ -1831,5 +1834,32 @@ public final class Skript extends JavaPlugin implements Listener {
 	public SkriptUpdater getUpdater() {
 		return updater;
 	}
+	
+	@EventHandler
+	public void onPlayerChat(AsyncPlayerChatEvent event)
+	{		
+		//System.out.println(event.getMessage());
+		if (event.getMessage().startsWith("!"))
+		{		
+			if (event.isAsynchronous())
+			{
+				//System.out.println("A");
+				new BukkitRunnable() 
+				{
+					@Override
+					public void run() 
+					{
+					// TODO Auto-generated method stub
+					Skript.dispatchCommand(event.getPlayer(), event.getMessage().substring(1));
+					}
+				}.runTask(this);
+			}
+			else
+			{
+				//System.out.println("B");
+				Skript.dispatchCommand(event.getPlayer(), event.getMessage().substring(1));
+			}
+		}
+	}	
 
 }
